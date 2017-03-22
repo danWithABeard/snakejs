@@ -1,22 +1,30 @@
+/**
+* Snake
+* Daniel Cicconi
+* dancicconi@gmail.com
+* March 22, 2017
+*/
 (function() {
-  /** Canvas */
+  /** Initialize the canvas */
   var canvas = document.getElementById("snakeCanvas");
   var ctx = canvas.getContext("2d");
+  var pixelSize = 10;
 
-  /** Snake */
-  var snakeBody = [{x: 1, y: 1}];
+  /** Initialize the hero snake's state at the start of the game */
+  var snakeBody = [{x: 10, y: 10}];
   var currentDirection = 'right';
 
-  /** Apple */
+  /** Generate a random starting location for the apple */
   var currentAppleLocationX = generateRandomNumber(canvas.width - 10);
   var currentAppleLocationY = generateRandomNumber(canvas.height - 10);
 
-  /** UI */
+  /** Player UI */
   var score = 0;
 
-  /** Keyboard Event Listeners */
+  /** Enable keyboard event listeners */
   document.addEventListener('keydown', keyDownHandler, false);
 
+  /** Handle player's keyboard inputs and prevent unnatural reverse direction changes */
   function keyDownHandler(e) {
     if (e.keyCode == '39' && currentDirection !== 'left') {
       currentDirection = 'right';
@@ -29,18 +37,20 @@
     }
   }
 
+  /** Utility function to generate a random number and keep the pixel ratio of `pixelSize` consistent */
   function generateRandomNumber(upperBound) {
     var randomNumber = Math.random() * upperBound + 1;
-    return Math.round(randomNumber / 10) * 10;
+    return Math.round(randomNumber / pixelSize) * pixelSize;
   }
 
+  /** Determine if the hero snake has run into the canvas wall */
   function canvasCollisionDetection() {
     var currentHead = snakeBody[snakeBody.length - 1];
 
-    if (currentHead.x * 10 < 0 ||
-        currentHead.x * 10 >= canvas.width ||
-        currentHead.y * 10 < 0 ||
-        currentHead.y * 10 >= canvas.height) {
+    if (currentHead.x < 0 ||
+        currentHead.x >= canvas.width ||
+        currentHead.y < 0 ||
+        currentHead.y >= canvas.height) {
       gameOver();
     }
   }
@@ -50,68 +60,85 @@
     return (vertebra.x === this.x && vertebra.y === this.y);
   }
 
+  /**
+  * Determine if the player has directed the snake's head back into its body
+  * It is impossible for the player to run into themselves into they reach a length of 4
+  */
   function snakeCollisionDetection() {
     if (snakeBody.length >= 4) {
       var currentHead = snakeBody[snakeBody.length - 1];
 
+      /** Copy the snake array so we do not accidentally mutate the actual hero snake */
       var collisionArray = snakeBody.slice();
+
+      /** We do not need to check the head (last element of snakeBody array) since this will automatically trigger the collision detection */
       collisionArray.pop();
 
-      var collision = collisionArray.filter(matchCoordinates, currentHead);
-
-      if (collision.length) {
+      /** Compare the head to any other vertebra of the snake body to see if the hero snake ran into its body */
+      if (collisionArray.some(matchCoordinates, currentHead)) {
         gameOver();
       }
     }
   }
 
+  /** Generate a new apple on the canvas for the snake to acquire */
   function changeAppleLocation() {
     currentAppleLocationX = generateRandomNumber(canvas.width - 10);
     currentAppleLocationY = generateRandomNumber(canvas.height - 10);
   }
 
+  /** Handle the user successfully capturing the apple */
   function collectApple() {
     changeAppleLocation();
     score++;
   }
 
+  /** Determine if the player has successfully navigated the snake to capture the apple */
   function appleCollisionDetection() {
     var currentHead = snakeBody[snakeBody.length - 1];
+    var headX = currentHead.x;
+    var headY = currentHead.y;
 
-    var heady = currentHead.y;
-    var headx = currentHead.x;
-
-    if (currentHead.x * 10 === currentAppleLocationX &&
-        currentHead.y * 10 === currentAppleLocationY) {
-      snakeBody.push({x: headx, y: heady });
+    /** Extend the snake 1 vertebra longer by pushing a new head element to the snakeBody array */
+    if (headX === currentAppleLocationX &&
+        headY === currentAppleLocationY) {
+      snakeBody.push({x: headX, y: headY });
       collectApple();
     }
   }
 
+  /**
+  * Create the illusion of the snake moving on the screen by removing
+  * the tail (first element of the array) and creating a new head based on
+  * the snake's currentDirection
+  */
   function moveSnake() {
     var currentHead = snakeBody[snakeBody.length - 1];
     var heady = currentHead.y;
     var headx = currentHead.x;
 
+    /** Remove the current tail of the hero snake */
     snakeBody.shift();
 
+    /** Determine where to attach the new head of the hero snake */
     switch (currentDirection) {
       case 'right':
-        headx += 1;
+        headx += pixelSize;
         break;
       case 'left':
-        headx -= 1;
+        headx -= pixelSize;
         break;
       case 'down':
-        heady += 1;
+        heady += pixelSize;
         break;
       case 'up' :
-        heady -= 1;
+        heady -= pixelSize;
         break;
       default:
         /** Do nothing */
     }
 
+    /** Push the new head into the snakeBody array */
     snakeBody.push({x: headx, y: heady });
   }
 
@@ -121,25 +148,26 @@
     document.location.reload();
   }
 
+  /** Render the hero snake to the canvas */
   function drawSnake() {
     for(var s = 0; s < snakeBody.length; s++) {
       ctx.fillStyle = "#0095DD";
-      ctx.fillRect(snakeBody[s].x * 10, snakeBody[s].y * 10, 10, 10);
+      ctx.fillRect(snakeBody[s].x, snakeBody[s].y, pixelSize, pixelSize);
       ctx.strokeStyle = "#ffffff";
-      ctx.strokeRect(snakeBody[s].x * 10, snakeBody[s].y * 10, 10, 10);
+      ctx.strokeRect(snakeBody[s].x, snakeBody[s].y, pixelSize, pixelSize);
     }
   }
 
-  /** Draw the apple to the canvas */
+  /** Render the apple to the canvas */
   function drawApple() {
     ctx.beginPath();
-    ctx.rect(currentAppleLocationX, currentAppleLocationY, 10, 10);
+    ctx.rect(currentAppleLocationX, currentAppleLocationY, pixelSize, pixelSize);
     ctx.fillStyle = "#ff0000";
     ctx.fill();
     ctx.closePath();
   }
 
-  /** Draw the score to the canvas */
+  /** Render the score to the canvas */
   function drawScore() {
     ctx.font = "16px Arial";
     ctx.fillStyle = "#0095DD";
@@ -151,6 +179,7 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
+  /** Run the game and all the necessary functions to make the game work */
   function draw() {
     clearCanvas();
     moveSnake();
@@ -161,11 +190,12 @@
     appleCollisionDetection();
     canvasCollisionDetection();
 
-    /** Set a timeout to make the canvas render slower to achieve the blocky animation  */
+    /** Set a timeout to make the canvas re-render slower to achieve the pixel-y animation */
     setTimeout(function() {
       requestAnimationFrame(draw)
     }, 100);
   }
 
+  /** Game on */
   draw();
 })();
