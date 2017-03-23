@@ -11,8 +11,8 @@
   var pixelSize = 10;
 
   /** Initialize the hero snake's state at the start of the game */
-  var snakeBody = [{x: 10, y: 10}];
-  var currentDirection = 'right';
+  var snakeBody = [{x: canvas.width / 2, y: canvas.height - pixelSize}];
+  var currentDirection = 'up';
 
   /** Generate a random starting location for the apple */
   var currentAppleLocationX = generateRandomNumber(canvas.width - 10);
@@ -20,6 +20,9 @@
 
   /** Player UI */
   var score = 0;
+  var gameColor = "#111111";
+  var appleColor = "#d44d5c";
+  var canvasColor = "#eeeeee";
 
   /** Enable keyboard event listeners */
   document.addEventListener('keydown', keyDownHandler, false);
@@ -99,9 +102,8 @@
     var headX = currentHead.x;
     var headY = currentHead.y;
 
-    /** Extend the snake 1 vertebra longer by pushing a new head element to the snakeBody array */
-    if (headX === currentAppleLocationX &&
-        headY === currentAppleLocationY) {
+    /** Extend the snake one vertebra longer by pushing a new head element to the snakeBody array */
+    if (headX === currentAppleLocationX && headY === currentAppleLocationY) {
       snakeBody.push({x: headX, y: headY });
       collectApple();
     }
@@ -151,9 +153,9 @@
   /** Render the hero snake to the canvas */
   function drawSnake() {
     for(var s = 0; s < snakeBody.length; s++) {
-      ctx.fillStyle = "#0095DD";
+      ctx.fillStyle = gameColor;
       ctx.fillRect(snakeBody[s].x, snakeBody[s].y, pixelSize, pixelSize);
-      ctx.strokeStyle = "#ffffff";
+      ctx.strokeStyle = canvasColor;
       ctx.strokeRect(snakeBody[s].x, snakeBody[s].y, pixelSize, pixelSize);
     }
   }
@@ -162,7 +164,7 @@
   function drawApple() {
     ctx.beginPath();
     ctx.rect(currentAppleLocationX, currentAppleLocationY, pixelSize, pixelSize);
-    ctx.fillStyle = "#ff0000";
+    ctx.fillStyle = appleColor;
     ctx.fill();
     ctx.closePath();
   }
@@ -170,7 +172,7 @@
   /** Render the score to the canvas */
   function drawScore() {
     ctx.font = "16px Arial";
-    ctx.fillStyle = "#0095DD";
+    ctx.fillStyle = gameColor;
     ctx.fillText("Score: " + score, 8, 20);
   }
 

@@ -1,8 +1,8 @@
 {
   "author": "Daniel Cicconi",
   "name": "dwab-snake",
-  "version": "0.0.1",
-  "description": "Display a feed of user events for BlueStreak",
+  "version": "0.0.0",
+  "description": "Play the game snake in your browser",
   "dependencies": {},
   "devDependencies": {
     "webpack": "^1.5.3"
