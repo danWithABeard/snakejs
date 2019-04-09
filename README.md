@@ -1,11 +1,8 @@
 # Snake
 
-Squarespace tech assessment by Daniel Cicconi (Software Engineer - Front End)
-dancicconi@gmail.com
-
 ## Reviewer Installation instructions:
 
- * Create a copy of the `/snake-dan-cicconi` directory on your local environment
+ * Create a copy of the repo on your local environment
  * Ensure that the `index.html`, `/js/snake.min.js`, and `/css/snake.css` files and directories are included
  * Open `index.html` in your favorite browser
  * Enjoy!
@@ -26,8 +23,6 @@ Be careful though, as our hero snake consumes more apples, the hero snake will g
 * Right arrow: Move the snake right
 
 ## Feature List
-
-I had so much fun working on this take home assessment that I plan to continue working on this even after submission.
 
 As it currently exists, the MVP is a playable game with a definitive goal and end condition. To make the player's experience even more enjoyable, I would love to add some more features later including:
 
